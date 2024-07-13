@@ -33,20 +33,16 @@ class Player extends GameObject
 
     public function onButtonPressed(KeyPressedEvent $event, GameObjects $gameObjects): void
     {
-        //          gs.player.a += float(gs.player.turn)*.05; // TODO measure elapsed time and modify the speed accordingly
-        //            float nx = gs.player.x + gs.player.walk*cos(gs.player.a)*.05;
-        //            float ny = gs.player.y + gs.player.walk*sin(gs.player.a)*.05;
-
         if ($event->isLeftArrowKeyPressed()) {
             $this->directionAngel -= 0.5;
         } elseif ($event->isRightArrowKeyPressed()) {
             $this->directionAngel += 0.5;
         } elseif ($event->isUpArrowKeyPressed()) {
-            $this->x = $this->x + cos($this->directionAngel) * 0.05;
-            $this->y = $this->y + sin($this->directionAngel) * 0.05;
+            $this->x = $this->x + cos($this->directionAngel) * 0.5;
+            $this->y = $this->y + sin($this->directionAngel) * 0.5;
         } elseif ($event->isDownArrowKeyPressed()) {
-            $this->x = $this->x - cos($this->directionAngel) * 0.05;
-            $this->y = $this->y - sin($this->directionAngel) * 0.05;
+            $this->x = $this->x - cos($this->directionAngel) * 0.5;
+            $this->y = $this->y - sin($this->directionAngel) * 0.5;
         }
     }
 
