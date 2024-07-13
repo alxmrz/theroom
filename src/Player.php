@@ -3,6 +3,8 @@
 namespace TR;
 
 use PsyXEngine\GameObject;
+use PsyXEngine\GameObjects;
+use PsyXEngine\KeyPressedEvent;
 
 class Player extends GameObject
 {
@@ -16,12 +18,36 @@ class Player extends GameObject
         $this->x = 3.456; // player x position
         $this->y = 2.345; // player y position
         $this->directionAngel = 1.523; // player view direction
+        //$this->directionAngel = 0.0; // player view direction
         $this->fieldOfView = M_PI / 3.;
     }
 
     public function update(): void
     {
+        //$this->directionAngel+= 2*M_PI/360;
+        //$this->directionAngel+= 0.5;
+        if ($this->directionAngel>= 8) {
+        //    $this->directionAngel= 0;
+        }
+    }
 
+    public function onButtonPressed(KeyPressedEvent $event, GameObjects $gameObjects): void
+    {
+        //          gs.player.a += float(gs.player.turn)*.05; // TODO measure elapsed time and modify the speed accordingly
+        //            float nx = gs.player.x + gs.player.walk*cos(gs.player.a)*.05;
+        //            float ny = gs.player.y + gs.player.walk*sin(gs.player.a)*.05;
+
+        if ($event->isLeftArrowKeyPressed()) {
+            $this->directionAngel -= 0.5;
+        } elseif ($event->isRightArrowKeyPressed()) {
+            $this->directionAngel += 0.5;
+        } elseif ($event->isUpArrowKeyPressed()) {
+            $this->x = $this->x + cos($this->directionAngel) * 0.05;
+            $this->y = $this->y + sin($this->directionAngel) * 0.05;
+        } elseif ($event->isDownArrowKeyPressed()) {
+            $this->x = $this->x - cos($this->directionAngel) * 0.05;
+            $this->y = $this->y - sin($this->directionAngel) * 0.05;
+        }
     }
 
     public function isDisplayable(): bool

@@ -45,23 +45,38 @@ SSSSSS*SSS*SSSSSS|
     "0002222222200000";
     private int $mapW = 16;
     private int $mapH = 16;
-    public $pixBuff = null;
+    public ?PixelBuffer $pixBuff = null;
     private Player $player;
     private int $winWidth;
     private int $winHeight;
     private array $buffer;
+    /**
+     * @var array|mixed
+     */
+    private array $colors;
+
 
     public function initialize(Player $player): void
     {
         $this->player = $player;
-        $this->winWidth = 900;
-        $this->winHeight = 600;
+        $this->winWidth = 256;
+        $this->winHeight = 256;
         $this->pixBuff = new PixelBuffer($this->winWidth * $this->winHeight);
-        $this->buffer = $this->createImageBuffer($this->winWidth, $this->winHeight);
+        $this->buffer = array_fill(0, $this->winWidth * $this->winHeight, 255);
+
+        $nColors = 10;
+        $this->colors = [];
+        for ($i = 0; $i < $nColors; $i++) {
+            $this->colors[$i] = $this->packColor(rand()%255, rand()%255, rand()%255);
+        }
+
     }
 
     public function generateMap()
     {
+        $this->buffer = array_fill(0, $this->winWidth * $this->winHeight, 255);
+        $this->pixBuff->fillWith(255);
+
         $rectW = (int)($this->winWidth / ($this->mapW * 2));
         $rectH = (int)($this->winHeight / $this->mapH);
         for ($y = 0; $y < $this->mapH; $y++) {
@@ -72,6 +87,11 @@ SSSSSS*SSS*SSSSSS|
 
                 $rectX = $x * $rectW;
                 $rectY = $y * $rectH;
+
+                $colorIndex = $this->map[$x + $y * $this->mapW];
+                $color = $this->colors[$colorIndex] ?:  $this->packColor(0, 255, 255);
+
+
                 $this->drawRectangle(
                     $this->buffer,
                     $this->winWidth,
@@ -80,7 +100,7 @@ SSSSSS*SSS*SSSSSS|
                     $rectY,
                     $rectW,
                     $rectH,
-                    $this->packColor(0, 255, 255)
+                    $color
                 );
             }
         }
@@ -95,7 +115,7 @@ SSSSSS*SSS*SSSSSS|
             5,
             $this->packColor(255, 255, 255)
         ); // draw player
-
+        $loops = 0;
         for ($i = 0; $i < (int)($this->winWidth / 2); $i++) {
             $angle = $this->player->getDirectionAngel() - $this->player->getFieldOfView(
                 ) / 2 + $this->player->getFieldOfView() * $i / (float)($this->winWidth / 2);
@@ -111,6 +131,10 @@ SSSSSS*SSS*SSSSSS|
                 $this->pixBuff->add($pixX + $pixY * $this->winWidth, $this->packColor(160, 160, 160));
 
                 if ($this->map[(int)$cx + (int)$cy * $this->mapW] !== ' ') {
+
+                    $colorIndex = $this->map[(int)$cx + (int)$cy * $this->mapW];
+                    $color = $this->colors[$colorIndex] ?:  $this->packColor(0, 255, 255);
+
                     $columnHeight = $this->winHeight / $t;
                     $this->drawRectangle(
                         $this->buffer,
@@ -120,14 +144,17 @@ SSSSSS*SSS*SSSSSS|
                         (int)($this->winHeight / 2 - $columnHeight / 2),
                         1,
                         $columnHeight,
-                        $this->packColor(0, 255, 255)
+                        $color
                     );
 
                     break;
                 }
+
+                $loops++;
             }
         }
-
+        echo "LOOOPS: " . $loops . "\n";
+        echo "DA: " . $this->player->getDirectionAngel() . "\n";
 
         //$this->saveImage(__DIR__ . "/../resources/imgkk.png", $buffer, $winWidth, $winHeight);
         //$this->pixBuff = $buffer;
@@ -164,6 +191,8 @@ SSSSSS*SSS*SSSSSS|
                 $this->pixBuff->add($x + $y * $width, $this->packColor(255, 255, 255));
             }
         }
+
+
 
         return $buffer;
     }

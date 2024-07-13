@@ -33,6 +33,7 @@ class Game implements GameInterface
 
         Engine::$pixBuff =  $this->level->pixBuff;
 
+        $gameObjects->add($player);
         //$gameObjects->add(new Map());
        // $gameObjects->add(new Map3D());
     }
