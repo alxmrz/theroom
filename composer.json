@@ -1,0 +1,26 @@
+{
+    "name": "alxmrz/theroom",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "alxmrz",
+            "email": "alexandr.moroz97@mail.ru"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "alxmrz/psyx-engine": "dev-main"
+    },
+    "repositories": [{
+        "type": "path",
+        "url": "../psyengine"
+    },{
+        "type": "path",
+        "url": "../ffi"
+    }],
+    "autoload": {
+        "psr-4": {
+            "TR\\": "src/"
+        }
+    }
+}

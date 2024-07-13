@@ -1,0 +1,86 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "da9c51edfec4211856aa9c59c95c086a",
+    "packages": [
+        {
+            "name": "alxmrz/php-sdl2",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../ffi",
+                "reference": "5e07feb346d42ad31a79326e41c8fb0d4623d270"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SDL2\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "alxmrz",
+                    "email": "alexandr.moroz97@mail.ru"
+                }
+            ],
+            "description": "PHP binding for SDL2 library",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "alxmrz/psyx-engine",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../psyengine",
+                "reference": "ccc6d1a7652172d5e9d42e627d27b96ea27fb1d6"
+            },
+            "require": {
+                "alxmrz/php-sdl2": "dev-main"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PsyXEngine\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "alxmrz",
+                    "email": "alexandr.moroz97@mail.ru"
+                }
+            ],
+            "description": "PHP game engine",
+            "transport-options": {
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "alxmrz/psyx-engine": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+}
