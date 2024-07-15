@@ -12,11 +12,11 @@
         "alxmrz/psyx-engine": "dev-main"
     },
     "repositories": [{
-        "type": "path",
-        "url": "../psyengine"
+        "type": "vcs",
+        "url": "https://github.com/alxmrz/psyx-engine"
     },{
-        "type": "path",
-        "url": "../ffi"
+        "type": "vcs",
+        "url": "https://github.com/alxmrz/php-sdl2"
     }],
     "autoload": {
         "psr-4": {
