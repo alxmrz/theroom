@@ -12,7 +12,7 @@
             "dist": {
                 "type": "path",
                 "url": "../ffi",
-                "reference": "5e07feb346d42ad31a79326e41c8fb0d4623d270"
+                "reference": "3e6e8237776991ae342320293ba4c03782d2206e"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9"
@@ -43,7 +43,7 @@
             "dist": {
                 "type": "path",
                 "url": "../psyengine",
-                "reference": "ccc6d1a7652172d5e9d42e627d27b96ea27fb1d6"
+                "reference": "a8da835c6ae13abdd26d50b6ac7edd17b3f6d365"
             },
             "require": {
                 "alxmrz/php-sdl2": "dev-main"
