@@ -3,10 +3,8 @@
 namespace TR;
 
 use PsyXEngine\GameObject;
-use PsyXEngine\Image;
 use PsyXEngine\PixelTexture;
 use SDL2\PixelBuffer;
-use SDL2\SDLRect;
 
 class Map extends GameObject
 {
@@ -193,7 +191,6 @@ class Map extends GameObject
                 }
 
 
-                // $buffer[$cx + $cy * $width] = $color;
                 $this->pixBuff->add($index, $color);
             }
         }

@@ -8,27 +8,38 @@ use PsyXEngine\KeyPressedEvent;
 
 class Player extends GameObject
 {
+    /**
+     * fieldOfView of the player
+     * @var float
+     */
     private float $fieldOfView;
+
+    /**
+     * 
+     * Angle of view direction
+     * 
+     * @var float
+     */
     private float $directionAngel;
+    /**
+     * player x position
+     *
+     * @var float
+     */
     private float $y;
+    /**
+     * Player y position 
+     *
+     * @var float
+     */
     private float $x;
 
     public function __construct()
     {
-        $this->x = 3.456; // player x position
-        $this->y = 2.345; // player y position
-        $this->directionAngel = 1.523; // player view direction
-        //$this->directionAngel = 0.0; // player view direction
+        $this->x = 3.456;
+        $this->y = 2.345;
+        $this->directionAngel = 1.523;
         $this->fieldOfView = M_PI / 3.;
-    }
-
-    public function update(): void
-    {
-        //$this->directionAngel+= 2*M_PI/360;
-        //$this->directionAngel+= 0.5;
-        if ($this->directionAngel>= 8) {
-        //    $this->directionAngel= 0;
-        }
     }
 
     public function onButtonPressed(KeyPressedEvent $event, GameObjects $gameObjects): void
@@ -56,19 +67,9 @@ class Player extends GameObject
         return $this->fieldOfView;
     }
 
-    public function setFieldOfView(float $fieldOfView): void
-    {
-        $this->fieldOfView = $fieldOfView;
-    }
-
     public function getDirectionAngel(): float
     {
         return $this->directionAngel;
-    }
-
-    public function setDirectionAngel(float $directionAngel): void
-    {
-        $this->directionAngel = $directionAngel;
     }
 
     public function getY(): float
@@ -76,18 +77,8 @@ class Player extends GameObject
         return $this->y;
     }
 
-    public function setY(float $y): void
-    {
-        $this->y = $y;
-    }
-
     public function getX(): float
     {
         return $this->x;
-    }
-
-    public function setX(float $x): void
-    {
-        $this->x = $x;
     }
 }
