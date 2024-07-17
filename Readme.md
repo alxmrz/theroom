@@ -6,4 +6,4 @@ Demo of semi-3d abilities of PsyXEngine.
 
 Run with JIT to see 15 framerate, otherwise it will be much more slower: 
 
-`php -dopcache.enable_cli=1 -dopcache.jit_buffer_size=100M   src/main.php`
+`php -dopcache.enable_cli=1 -dopcache.jit=on -dopcache.jit_buffer_size=100M   src/main.php`
