@@ -8,7 +8,9 @@ use SDL2\PixelBuffer;
 
 class Map extends GameObject
 {
-
+    private const MAX_VIEW_DEPTH = 20;
+    private const VIEW_DEPTH_INCREMENT = 0.01;
+    private const EMPTY_FIELD = ' ';
     private string $map = "0000222222220000" .
     "1              0" .
     "1      11111   0" .
@@ -36,6 +38,10 @@ class Map extends GameObject
      */
     private array $colors;
     private bool $showMap;
+    private int $rectW = 0;
+    private int $rectH = 0;
+    private int $grayColor = 0;
+    private int $loops = 0;
 
     public function __construct(Player $player, int $width, int $height, bool $showMap = false)
     {
@@ -49,13 +55,22 @@ class Map extends GameObject
 
         $this->renderType = new PixelTexture($this->pixBuff, $width, $height);
 
+        $this->colors = $this->createRandomColors();
 
-        $nColors = 10;
-        $this->colors = [];
-        for ($i = 0; $i < $nColors; $i++) {
-            $this->colors[$i] = $this->packColor(rand() % 255, rand() % 255, rand() % 255);
+        $this->rectW = (int)($this->winWidth / ($this->mapW * 2));
+        $this->rectH = (int)($this->winHeight / $this->mapH);
+        $this->grayColor = $this->packColor(160, 160, 160);
+    }
+
+    private function createRandomColors(): array
+    {
+        $result = [];
+
+        for ($i = 0; $i < 10; $i++) {
+            $result[$i] = $this->packColor(rand() % 255, rand() % 255, rand() % 255);
         }
 
+        return $result;
     }
 
     public function update(): void
@@ -63,77 +78,37 @@ class Map extends GameObject
         $this->generateMap();
     }
 
-    public function generateMap()
+    private function generateMap()
     {
-        $this->pixBuff->fillWith(255);
-
-        $rectW = (int)($this->winWidth / ($this->mapW * 2));
-        $rectH = (int)($this->winHeight / $this->mapH);
+        $this->clear();
         
         if ($this->showMap) {
-            $this->drawMap($rectW, $rectH);
+            // TODO: it can be generated once and separately from 3d view and 2d cone
+            $this->drawMap($this->rectW, $this->rectH);
         }
 
-        $loops = 0;
+        $this->loops = 0;
 
-        $rayCount = $this->winWidth;
-        $greyColor = $this->packColor(160, 160, 160);
+        $raysCount = $this->winWidth;
 
         $loopTime = microtime(true);
-        for ($i = 0; $i < (int)($rayCount); $i++) {
-            $angle = $this->player->getDirectionAngel() - $this->player->getFieldOfView(
-                ) / 2 + $this->player->getFieldOfView() * $i / (float)($rayCount);
+        for ($i = 0; $i < (int)($raysCount); $i++) {
+            $angle = $this->player->getDirectionAngel()
+                - ($this->player->getFieldOfView() / 2)
+                + ($this->player->getFieldOfView() * $i / (float)($raysCount));
 
-            $t = 0;
-
-            for (; $t < 20; $t += 0.01) {
-                $loops++;
-                $cx = $this->player->getX() + $t * cos($angle);
-                $cy = $this->player->getY() + $t * sin($angle);
-
-
-                if ($this->showMap) {
-                    $pixX = (int)($cx * $rectW);
-                    $pixY = (int)($cy * $rectH);
-                    $this->pixBuff->add($pixX + $pixY * $this->winWidth, $greyColor);
-                }
-                
-
-                if ($this->map[(int)$cx + (int)$cy * $this->mapW] !== ' ') {
-                    $colorIndex = $this->map[(int)$cx + (int)$cy * $this->mapW];
-                    $color = $this->colors[$colorIndex] ?: $this->packColor(0, 255, 255);
-
-                    $depth = $t * cos($angle - $this->player->getDirectionAngel());
-
-                    if (!$depth) {
-                        $columnHeight = 0;
-                    } else {
-                        $columnHeight = $this->winHeight / ($depth);
-                    }
-                    $rectY1 = (int)($this->winHeight / 2 - $columnHeight / 2);
-                    $this->drawRectangle(
-                        $this->winWidth,
-                        $this->winHeight,
-                        (int)($i), // position of vertical column, was (int)($rayCount + $i) - when map added
-                        $rectY1,
-                        1,
-                        $columnHeight,
-                        $color
-                    );
-
-                    break;
-                }
-
-
-            }
+            $this->drawObjectsInAngleRange($angle, $i);
         }
-
         $endTime = microtime(true);
-        $timeElapsed = round(($endTime - $loopTime) * 1000);
 
-        echo "LOOOPS: " . $loops . "\n";
-        echo "LOOOPS TIME: " . $timeElapsed . "\n";
+        echo "LOOOPS: " . $this->loops . "\n";
+        echo "LOOOPS TIME: " . round(($endTime - $loopTime) * 1000) . "\n";
         echo "DA: " . $this->player->getDirectionAngel() . "\n";
+    }
+
+    private function clear(): void
+    {
+        $this->pixBuff->fillWith(255);
     }
 
     private function drawMap(int $rectW, int $rectH)
@@ -173,7 +148,71 @@ class Map extends GameObject
         ); // draw player
     }
 
-    public function drawRectangle($width, $height, $rectX, $rectY, $rectW, $rectH, $color)
+    private function drawObjectsInAngleRange(float $angle, int $rangeIndex)
+    {
+        for ($currentViewDepth = 0; $currentViewDepth < self::MAX_VIEW_DEPTH; $currentViewDepth += self::VIEW_DEPTH_INCREMENT) {
+            $this->loops++;
+
+            // origin forumula is: cos($angle) = c/a => a = c * cos(angle);
+            // where a is offset for X coord of x line of ray in current view Depth 
+            // and c = $currentViewDepth
+            $cx = $this->player->getX() + $currentViewDepth * cos($angle);
+
+            // origin forumula is: sin(angle) = b/c => a = c * sin(angle);
+            // where a is offset for Y coord of y line of ray in current view Depth  
+            // and c = $currentViewDepth
+            $cy = $this->player->getY() + $currentViewDepth * sin($angle);
+
+
+            if ($this->showMap) {
+                $this->draw2DConePixel($cx, $cy);
+            }
+            
+            if ($this->hasWallInCoord((int) $cx, (int) $cy)) {
+                $this->drawColumn((int)$cx, (int)$cy, $currentViewDepth, $angle, $rangeIndex);
+
+                break;
+            }
+        }
+    }
+
+    private function draw2DConePixel(float $cx, float $cy): void
+    {
+        $pixX = (int)($cx * $this->rectW);
+        $pixY = (int)($cy * $this->rectH);
+        $this->pixBuff->add($pixX + $pixY * $this->winWidth, $this->packColor(160, 160, 160));
+    }
+
+    private function hasWallInCoord(int $cx, int $cy): bool
+    {
+        return $this->map[$cx + $cy * $this->mapW] !== self::EMPTY_FIELD;
+    }
+
+    private function drawColumn(int $cx, int $cy, float $currentViewDepth, float $angle, int $i): void
+    {
+        $colorIndex = $this->map[$cx + $cy * $this->mapW];
+        $color = $this->colors[$colorIndex] ?: $this->packColor(0, 255, 255);
+
+        // Calc depth for column drawing with fixing fish eye problem (* cos($angle - $this->player->getDirectionAngel()))
+        $columnDepth = $currentViewDepth * cos($angle - $this->player->getDirectionAngel());
+
+        $columnHeight = !$columnDepth
+            ? 0
+            : $this->winHeight / $columnDepth;
+        
+        $rectY = (int)($this->winHeight / 2 - $columnHeight / 2);
+        $this->drawRectangle(
+            $this->winWidth,
+            $this->winHeight,
+            (int)($i), // position of vertical column, was (int)($rayCount + $i) - when map added
+            $rectY,
+            1,
+            $columnHeight,
+            $color
+        );
+    }
+
+    private function drawRectangle($width, $height, $rectX, $rectY, $rectW, $rectH, $color)
     {
         for ($x = 0; $x < $rectW; $x++) {
             for ($y = 0; $y < $rectH; $y++) {
@@ -208,5 +247,4 @@ class Map extends GameObject
         $r = ($color >> 16) & 255;
         $a = ($color >> 24) & 255;
     }
-
 }
