@@ -13,7 +13,7 @@ class Game implements GameInterface
         $player = new Player();
 
         $gameObjects->add($player);
-        $gameObjects->add(new Map($player, 1024, 512));
+        $gameObjects->add(new Map($player, 1024, 512, isset(getopt('', ['withMap'])['withMap'])));
     }
 
     public function update(?Event $event = null): void

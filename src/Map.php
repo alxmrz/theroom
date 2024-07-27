@@ -43,7 +43,7 @@ class Map extends GameObject
     private int $grayColor = 0;
     private int $loops = 0;
 
-    public function __construct(Player $player, int $width, int $height, bool $showMap = false)
+    public function __construct(Player $player, int $width, int $height, bool $showMap = true)
     {
         $this->player = $player;
         $this->winWidth = $width;
@@ -89,13 +89,12 @@ class Map extends GameObject
 
         $this->loops = 0;
 
-        $raysCount = $this->winWidth;
-
         $loopTime = microtime(true);
-        for ($i = 0; $i < (int)($raysCount); $i++) {
+        $raysCount = $this->getRaysCount();
+        for ($i = 0; $i < (int)$raysCount; $i++) {
             $angle = $this->player->getDirectionAngel()
                 - ($this->player->getFieldOfView() / 2)
-                + ($this->player->getFieldOfView() * $i / (float)($raysCount));
+                + ($this->player->getFieldOfView() * $i / $raysCount);
 
             $this->drawObjectsInAngleRange($angle, $i);
         }
@@ -105,6 +104,16 @@ class Map extends GameObject
         echo "LOOOPS TIME: " . round(($endTime - $loopTime) * 1000) . "\n";
         echo "DA: " . $this->player->getDirectionAngel() . "\n";
     }
+
+    private function getRaysCount(): float
+    {
+        if ($this->showMap) {
+            return $this->winWidth / 2;
+        }
+
+        return (float) $this->winWidth;
+    }
+
 
     private function clear(): void
     {
@@ -204,12 +213,21 @@ class Map extends GameObject
         $this->drawRectangle(
             $this->winWidth,
             $this->winHeight,
-            (int)($i), // position of vertical column, was (int)($rayCount + $i) - when map added
+            (int)($this->calcColumnXOffset() + $i), // position of vertical column, was (int)($rayCount + $i) - when map added
             $rectY,
             1,
             $columnHeight,
             $color
         );
+    }
+
+    private function calcColumnXOffset(): int
+    {
+        if ($this->showMap) {
+            return $this->getRaysCount();
+        }
+
+        return 0;
     }
 
     private function drawRectangle($width, $height, $rectX, $rectY, $rectW, $rectH, $color)
